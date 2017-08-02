@@ -75,6 +75,11 @@ else
 CFLAGS+=-fPIC
 endif
 
+ifdef QUETOO
+ARCH=
+CFLAGS+=-DQUETOO
+endif
+
 #############################################################################
 # SETUP AND BUILD
 # GAME

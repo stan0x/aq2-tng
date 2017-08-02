@@ -12,7 +12,11 @@
 // This is the PG Bund Edition V1.25 with all stuff laying around here...
 //
 //-----------------------------------------------------------------------------
+#ifdef QUETOO
+#include "quetoo/game.h"
+#else
 #define GAME_API_VERSION        3
+#endif
 
 // edict->svflags
 
