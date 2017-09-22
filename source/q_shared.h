@@ -1338,6 +1338,7 @@ temp_event_t;
 #define SHORT2ANGLE(x)  ((x)*(360.0/65536))
 
 
+#ifndef QUETOO
 //
 // config strings are a general means of communication from
 // the server to all connected clients.
@@ -1366,6 +1367,16 @@ temp_event_t;
 #define CS_GENERAL              (CS_PLAYERSKINS+MAX_CLIENTS)
 #define MAX_CONFIGSTRINGS       (CS_GENERAL+MAX_GENERAL)
 // ^^^
+#else
+// FIXME: Quetoo doesn't use these, so my replacements are arbitrary and probably bad.
+#define CS_PLAYERSKINS CS_CLIENTS
+#define CS_CDTRACK     CS_MUSICS
+#define CS_MAXCLIENTS (CS_GENERAL+0)
+#define CS_STATUSBAR  (CS_GENERAL+1)
+#define CS_SKYROTATE  (CS_GENERAL+2)
+#define CS_SKYAXIS    (CS_GENERAL+3)
+#define CS_LIGHTS     (CS_GENERAL+4)
+#endif
 
 
 //==============================================
