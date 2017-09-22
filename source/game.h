@@ -12,11 +12,8 @@
 // This is the PG Bund Edition V1.25 with all stuff laying around here...
 //
 //-----------------------------------------------------------------------------
-#ifdef QUETOO
-#include "quetoo/game.h"
-#else
+#pragma once
 #define GAME_API_VERSION        3
-#endif
 
 // edict->svflags
 
@@ -26,6 +23,7 @@
 
 // edict->solid values
 
+#ifndef QUETOO
 typedef enum
 {
   SOLID_NOT,			// no interaction with other objects
@@ -34,6 +32,7 @@ typedef enum
   SOLID_BSP			// bsp clip, touch on edge
 }
 solid_t;
+#endif
 
 //===============================================================
 

@@ -77,7 +77,7 @@ endif
 
 ifdef QUETOO
 ARCH=
-CFLAGS+=-DQUETOO
+CFLAGS+=-DQUETOO=1
 endif
 
 #############################################################################
@@ -98,6 +98,10 @@ GAME_OBJS = \
 	p_client.o p_hud.o p_view.o p_weapon.o q_shared.o \
 	tng_stats.o tng_flashlight.o tng_irc.o tng_ini.o tng_balancer.o \
 	g_grapple.o
+
+ifdef QUETOO
+GAME_OBJS += quetoo/g_main.o
+endif
 
 game$(ARCH).$(SHLIBEXT): $(GAME_OBJS)
 	$(DO_LINK)

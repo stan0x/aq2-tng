@@ -19,11 +19,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include "g_local.h"
+#include "../g_local.h"
+#undef GAME_API_VERSION
+#include "game.h"
+#include "../game.h"
 
-g_import_t gi;
-g_export_t ge;
+g_import_t quetoo_gi;
+g_export_t quetoo_ge;
 
+/*
 ai_export_t *aix;
 
 g_game_t g_game;
@@ -79,10 +83,12 @@ cvar_t *dedicated;
 
 g_team_t g_teamlist[MAX_TEAMS];
 static g_team_t g_teamlist_default[MAX_TEAMS];
+*/
 
 /**
  * @brief
  */
+/*
 static void G_InitTeam(const g_team_id_t id, const char *name, const int16_t color, const char tint[COLOR_MAX_LENGTH], const int16_t effect) {
 	g_team_t *team = &g_teamlist[id];
 
@@ -103,10 +109,12 @@ static void G_InitTeam(const g_team_id_t id, const char *name, const int16_t col
 	g_strlcpy(team->flag, va("item_flag_team%i", id + 1), sizeof(team->flag));
 	g_strlcpy(team->spawn, va("info_player_team%i", id + 1), sizeof(team->spawn));
 }
+*/
 
 /**
  * @brief
  */
+/*
 void G_ResetTeams(void) {
 
 	memset(g_teamlist, 0, sizeof(g_teamlist));
@@ -120,10 +128,12 @@ void G_ResetTeams(void) {
 
 	G_SetTeamNames();
 }
+*/
 
 /**
  * @brief Send the names of the teams to the clients.
  */
+/*
 void G_SetTeamNames(void) {
 	char team_info[MAX_STRING_CHARS] = { '\0' };
 
@@ -140,18 +150,22 @@ void G_SetTeamNames(void) {
 
 	gi.SetConfigString(CS_TEAM_INFO, team_info);
 }
+*/
 
 /**
  * @brief Fetch the defaults for a team
  */
+/*
 const g_team_t *G_TeamDefaults(const g_team_t *team) {
 
 	return &g_teamlist_default[team->id];
 }
+*/
 
 /**
  * @brief
  */
+/*
 void G_ResetVote(void) {
 	int32_t i;
 
@@ -171,10 +185,12 @@ void G_ResetVote(void) {
 
 	g_level.vote_time = 0;
 }
+*/
 
 /**
  * @brief Reset all items in the level based on gameplay, CTF, etc.
  */
+/*
 void G_ResetItems(void) {
 
 	for (uint16_t i = 1; i < ge.num_entities; i++) { // reset items
@@ -206,10 +222,12 @@ void G_ResetItems(void) {
 
 	G_Ai_RegisterItems();
 }
+*/
 
 /**
  * @brief Checks and sets up the hook state
  */
+/*
 void G_CheckHook(void) {
 
 	if (g_strcmp0(g_hook->string, "default")) { // check cvar first
@@ -233,10 +251,12 @@ void G_CheckHook(void) {
 		g_hook_distance->modified = false;
 	}
 }
+*/
 
 /**
  * @brief Checks and sets up the tech states
  */
+/*
 void G_CheckTechs(void) {
 
 	if (g_strcmp0(g_techs->string, "default")) { // check cvar first
@@ -255,10 +275,12 @@ void G_CheckTechs(void) {
 		}
 	}
 }
+*/
 
 /**
  * @brief Setup the effects for spawn points
  */
+/*
 static void G_ResetTeamSpawnPoints(g_spawn_points_t *points, const g_entity_trail_t trail, const g_team_id_t team_id) {
 
 	for (size_t i = 0; i < points->count; i++) {
@@ -284,10 +306,12 @@ static void G_ResetTeamSpawnPoints(g_spawn_points_t *points, const g_entity_trai
 		}
 	}
 }
+*/
 
 /**
  * @brief Setup the effects for spawn points
  */
+/*
 void G_ResetSpawnPoints(void) {
 
 	// reset trails to 0 first
@@ -301,12 +325,14 @@ void G_ResetSpawnPoints(void) {
 		G_ResetTeamSpawnPoints(&g_teamlist[t].spawn_points, TRAIL_PLAYER_SPAWN, t);
 	}
 }
+*/
 
 /**
  * @brief For normal games, this just means reset scores and respawn.
  * For match games, this means cancel the match and force everyone
  * to ready again. Teams are only reset when teamz is true.
  */
+/*
 static void G_RestartGame(_Bool teamz) {
 
 	if (aix) { // reset bot level state before they respawn
@@ -391,10 +417,12 @@ static void G_RestartGame(_Bool teamz) {
 	gi.BroadcastPrint(PRINT_HIGH, "Game restarted\n");
 	gi.Sound(&g_game.entities[0], g_media.sounds.teleport, ATTEN_NONE, 0);
 }
+*/
 
 /**
  * @brief
  */
+/*
 void G_MuteClient(char *name, _Bool mute) {
 	g_client_t *cl;
 
@@ -404,10 +432,12 @@ void G_MuteClient(char *name, _Bool mute) {
 
 	cl->locals.muted = mute;
 }
+*/
 
 /**
  * @brief
  */
+/*
 static void G_BeginIntermission(const char *map) {
 
 	if (g_level.intermission_time) {
@@ -460,10 +490,12 @@ static void G_BeginIntermission(const char *map) {
 	// stay on same level if not provided
 	g_level.next_map = map ? : g_level.name;
 }
+*/
 
 /**
  * @brief The time limit, frag limit, etc.. has been exceeded.
  */
+/*
 static void G_EndLevel(void) {
 
 	const g_map_list_map_t *map = G_MapList_Next();
@@ -477,10 +509,12 @@ static void G_EndLevel(void) {
 		G_BeginIntermission(NULL);
 	}
 }
+*/
 
 /**
  * @brief
  */
+/*
 static void G_CheckVote(void) {
 	int32_t i, count = 0;
 
@@ -528,10 +562,12 @@ static void G_CheckVote(void) {
 		G_ResetVote();
 	}
 }
+*/
 
 /**
  * @brief
  */
+/*
 static void G_CheckRoundStart(void) {
 	int32_t i, clients;
 	g_client_t *cl;
@@ -597,10 +633,12 @@ static void G_CheckRoundStart(void) {
 
 	g_level.start_round = true;
 }
+*/
 
 /**
  * @brief
  */
+/*
 static void G_CheckRoundLimit() {
 	int32_t i;
 	g_entity_t *ent;
@@ -640,10 +678,12 @@ static void G_CheckRoundLimit() {
 		G_ClientRespawn(ent, false);
 	}
 }
+*/
 
 /**
  * @brief
  */
+/*
 static void G_CheckRoundEnd(void) {
 	uint32_t i, clients;
 	int32_t j;
@@ -739,10 +779,12 @@ static void G_CheckRoundEnd(void) {
 
 	G_CheckRoundLimit();
 }
+*/
 
 /**
  * @brief
  */
+/*
 static void G_CheckMatchEnd(void) {
 	int32_t i, clients;
 	g_client_t *cl;
@@ -797,10 +839,12 @@ static void G_CheckMatchEnd(void) {
 		}
 	}
 }
+*/
 
 /**
  * @brief
  */
+/*
 static char *G_FormatTime(uint32_t time) {
 	static char formatted_time[MAX_QPATH];
 	static uint32_t last_time = 0xffffffff;
@@ -821,10 +865,12 @@ static char *G_FormatTime(uint32_t time) {
 
 	return formatted_time;
 }
+*/
 
 /**
  * @brief
  */
+/*
 static void G_CheckRules(void) {
 	int32_t i;
 	_Bool restart = false;
@@ -1168,10 +1214,12 @@ static void G_CheckRules(void) {
 		G_RestartGame(true);	// reset all clients
 	}
 }
+*/
 
 /**
  * @brief
  */
+/*
 static void G_ExitLevel(void) {
 
 	gi.Cbuf(va("map %s\n", g_level.next_map));
@@ -1181,6 +1229,7 @@ static void G_ExitLevel(void) {
 
 	G_EndClientFrames();
 }
+*/
 
 #define INTERMISSION (10.0 * 1000) // intermission duration
 
@@ -1189,7 +1238,7 @@ static void G_ExitLevel(void) {
  * Nothing would happen in Quake land if this weren't called.
  */
 static void G_Frame(void) {
-
+/*
 	g_level.frame_num++;
 	g_level.time = g_level.frame_num * QUETOO_TICK_MILLIS;
 
@@ -1240,12 +1289,15 @@ static void G_Frame(void) {
 
 	// build the player_state_t structures for all players
 	G_EndClientFrames();
+*/
+	G_RunFrame();
 }
 
 /**
  * @brief Returns the game name advertised by the server in info strings.
  */
 static const char *G_GameName(void) {
+/*
 	static char name[64];
 	const size_t size = sizeof(name);
 
@@ -1259,19 +1311,24 @@ static const char *G_GameName(void) {
 	}
 
 	return name;
+*/
+	return "Action Quetoo"; // FIXME
 }
 
 /**
  * @brief Restart the game.
  */
+/*
 static void G_Restart_Sv_f(void) {
 
 	G_RestartGame(false);
 }
+*/
 
 /**
  * @brief Set up the CS_TEAMS configstring to the number of valid teams we have
  */
+/*
 void G_InitNumTeams(void) {
 
 	if (g_level.num_teams == -1) { // set to default, so let's set number of teams
@@ -1291,24 +1348,25 @@ void G_InitNumTeams(void) {
 
 	gi.SetConfigString(CS_TEAMS, va("%d", (g_level.teams || g_level.ctf) ? g_level.num_teams : 0));
 }
+*/
 
 /**
  * @brief This will be called when the game module is first loaded.
  */
 void G_Init(void) {
 
-	gi.Print("  ^5Game module initialization...\n");
+	quetoo_gi.Print("  ^5Game module initialization...\n");
 
-	const char *s = va("%s %s %s", VERSION, BUILD_HOST, REVISION);
-	cvar_t *game_version = gi.Cvar("game_version", s, CVAR_SERVER_INFO | CVAR_NO_SET, NULL);
+	//const char *s = va("%s %s %s", VERSION, BUILD_HOST, REVISION);
+	cvar_t *game_version = quetoo_gi.Cvar("game_version", VERSION, CVAR_SERVER_INFO | CVAR_NO_SET, NULL);
 
-	gi.Print("  ^5Version %s\n", game_version->string);
+	quetoo_gi.Print("  ^5Version %s\n", game_version->string);
 
-	memset(&g_game, 0, sizeof(g_game));
+	//memset(&g_game, 0, sizeof(g_game));
 
-	gi.Cvar("game_name", GAME_NAME, CVAR_SERVER_INFO | CVAR_NO_SET, NULL);
-	gi.Cvar("game_date", __DATE__, CVAR_SERVER_INFO | CVAR_NO_SET, NULL);
-
+	quetoo_gi.Cvar("game_name", "action", CVAR_SERVER_INFO | CVAR_NO_SET, NULL);
+	quetoo_gi.Cvar("game_date", __DATE__, CVAR_SERVER_INFO | CVAR_NO_SET, NULL);
+/*
 	g_admin_password = gi.Cvar("g_admin_password", "", CVAR_LATCH, "Password to authenticate as an admin");
 	g_ammo_respawn_time = gi.Cvar("g_ammo_respawn_time", "20.0", CVAR_SERVER_INFO, "Ammo respawn interval in seconds");
 	g_auto_join = gi.Cvar("g_auto_join", "1", CVAR_SERVER_INFO,
@@ -1404,8 +1462,10 @@ void G_Init(void) {
 	gi.Cmd("stuff", G_Stuff_Sv_f, CMD_GAME, "Force a client to execute a command");
 	gi.Cmd("stuff_all", G_StuffAll_Sv_f, CMD_GAME, "Force all players to execute a command");
 	gi.Cmd("g_restart", G_Restart_Sv_f, CMD_GAME, "Force the game to restart");
+*/
+	InitGame();
 
-	gi.Print("  ^5Game module initialized\n");
+	quetoo_gi.Print("  ^5Game module initialized\n");
 }
 
 /**
@@ -1414,18 +1474,19 @@ void G_Init(void) {
  */
 void G_Shutdown(void) {
 
-	gi.Print("  ^5Game module shutdown...\n");
-
+	quetoo_gi.Print("  ^5Game module shutdown...\n");
+/*
 	G_MySQL_Shutdown();
 	G_MapList_Shutdown();
 	G_Ai_Shutdown();
 
 	G_ShutdownVote();
-
-	gi.FreeTag(MEM_TAG_GAME_LEVEL);
-	gi.FreeTag(MEM_TAG_GAME);
+*/
+	quetoo_gi.FreeTag(MEM_TAG_GAME_LEVEL);
+	quetoo_gi.FreeTag(MEM_TAG_GAME);
 }
 
+/*
 void G_CallTimeOut(g_entity_t *ent) {
 
 	if (g_timeout_time->integer == 0) {
@@ -1461,10 +1522,12 @@ void G_CallTimeIn(void) {
 	g_level.timeout_time = 0;
 	g_level.timeout_frame = 0;
 }
+*/
 
 /*
  * Timer based stuff for the game (clock, countdowns, timeouts, etc)
  */
+/*
 void G_RunTimers(void) {
 	uint32_t j;
 	uint32_t time = g_level.time;
@@ -1543,6 +1606,12 @@ void G_RunTimers(void) {
 		}
 	}
 }
+*/
+
+cvar_t *quetoo_cvar( const char *name, const char *value, uint32_t flags, const char *desc )
+{
+	return quetoo_gi.Cvar( name, value, flags, "" );
+}
 
 /**
  * @brief This is the entry point responsible for aligning the server and game module.
@@ -1553,29 +1622,80 @@ void G_RunTimers(void) {
  */
 g_export_t *G_LoadGame(g_import_t *import) {
 
-	gi = *import;
+	quetoo_gi = *import;
 
-	memset(&ge, 0, sizeof(ge));
 
-	ge.api_version = GAME_API_VERSION;
-	ge.protocol = PROTOCOL_MINOR;
+	memset( &gi, 0, sizeof(gi) );
 
-	ge.Init = G_Init;
-	ge.Shutdown = G_Shutdown;
-	ge.SpawnEntities = G_SpawnEntities;
+	gi.bprintf = NULL;
+	gi.dprintf = NULL;
+	gi.cprintf = NULL;
+	gi.centerprintf = NULL;
+	gi.sound = NULL;
+	gi.positioned_sound = NULL;
+	gi.configstring = quetoo_gi.SetConfigString;
+	gi.error = NULL;
+	gi.modelindex = NULL;
+	gi.soundindex = NULL;
+	gi.imageindex = NULL;
+	gi.setmodel = NULL;
+	gi.trace = NULL;
+	gi.pointcontents = NULL;
+	gi.inPVS = NULL;
+	gi.inPHS = NULL;
+	gi.SetAreaPortalState = NULL;
+	gi.AreasConnected = NULL;
+	gi.linkentity = NULL;
+	gi.unlinkentity = NULL;
+	gi.BoxEdicts = NULL;
+	gi.Pmove = NULL;
+	gi.multicast = NULL;
+	gi.unicast = NULL;
+	gi.WriteChar = NULL;
+	gi.WriteByte = NULL;
+	gi.WriteShort = NULL;
+	gi.WriteLong = NULL;
+	gi.WriteFloat = NULL;
+	gi.WriteString = NULL;
+	gi.WritePosition = NULL;
+	gi.WriteDir = NULL;
+	gi.WriteAngle = NULL;
+	gi.TagMalloc = quetoo_gi.Malloc;
+	gi.TagFree = quetoo_gi.Free;
+	gi.FreeTags = quetoo_gi.FreeTag;
+	gi.cvar = &quetoo_cvar;
+	gi.cvar_set = NULL;
+	gi.cvar_forceset = NULL;
+	gi.argc = NULL;
+	gi.argv = NULL;
+	gi.args = NULL;
+	gi.AddCommandString = NULL;
+	gi.DebugGraph = NULL;
 
-	ge.ClientThink = G_ClientThink;
-	ge.ClientConnect = G_ClientConnect;
-	ge.ClientUserInfoChanged = G_ClientUserInfoChanged;
-	ge.ClientDisconnect = G_ClientDisconnect;
-	ge.ClientBegin = G_ClientBegin;
-	ge.ClientCommand = G_ClientCommand;
+	game_export_t *ge = GetGameAPI( &gi );
 
-	ge.Frame = G_Frame;
 
-	ge.GameName = G_GameName;
+	memset(&quetoo_ge, 0, sizeof(quetoo_ge));
 
-	ge.entity_size = sizeof(g_entity_t);
+	quetoo_ge.api_version = GAME_API_VERSION;
+	quetoo_ge.protocol = PROTOCOL_MINOR;
 
-	return &ge;
+	quetoo_ge.Init = G_Init;
+	quetoo_ge.Shutdown = G_Shutdown;
+	//quetoo_ge.SpawnEntities = G_SpawnEntities;
+
+	//quetoo_ge.ClientThink = G_ClientThink;
+	//quetoo_ge.ClientConnect = G_ClientConnect;
+	//quetoo_ge.ClientUserInfoChanged = G_ClientUserInfoChanged;
+	//quetoo_ge.ClientDisconnect = G_ClientDisconnect;
+	//quetoo_ge.ClientBegin = G_ClientBegin;
+	//quetoo_ge.ClientCommand = G_ClientCommand;
+
+	quetoo_ge.Frame = G_Frame;
+
+	quetoo_ge.GameName = G_GameName;
+
+	quetoo_ge.entity_size = sizeof(g_entity_t);
+
+	return &quetoo_ge;
 }

@@ -21,13 +21,117 @@
 
 #pragma once
 
-/*
-#include "shared.h"
-#include "filesystem.h"
-#include "ai/ai.h"
-*/
+//#include "shared.h"
+//#include "filesystem.h"
+//#include "ai/ai.h"
+#include "quetoo.h"
 
 #define GAME_API_VERSION 8
+#define PROTOCOL_MAJOR 1023
+#define PROTOCOL_MINOR 1018
+
+/**
+ * @brief Debug cateogories.
+ */
+typedef enum {
+	DEBUG_AI			= 1 << 0,
+	DEBUG_CGAME			= 1 << 1,
+	DEBUG_CLIENT		= 1 << 2,
+	DEBUG_COLLISION		= 1 << 3,
+	DEBUG_CONSOLE		= 1 << 4,
+	DEBUG_FILESYSTEM	= 1 << 5,
+	DEBUG_GAME			= 1 << 6,
+	DEBUG_NET			= 1 << 7,
+	DEBUG_PMOVE_CLIENT	= 1 << 8,
+	DEBUG_PMOVE_SERVER  = 1 << 9,
+	DEBUG_RENDERER		= 1 << 10,
+	DEBUG_SERVER		= 1 << 11,
+	DEBUG_SOUND			= 1 << 12,
+	DEBUG_UI			= 1 << 13,
+
+	DEBUG_BREAKPOINT	= (int32_t) (1u << 31),
+	DEBUG_ALL			= (int32_t) (0xFFFFFFFF & ~DEBUG_BREAKPOINT),
+} debug_t;
+
+/**
+ * @brief BSP planes are essential to collision detection as well as rendering.
+ * Quake uses "positive planes," where the plane distances are represented as
+ * negative offsets from the origin.
+ */
+typedef struct {
+	vec3_t normal;
+	vec_t dist;
+	uint16_t type; // for fast side tests
+	uint16_t sign_bits; // sign_x + (sign_y << 1) + (sign_z << 2)
+	uint16_t num; // the plane number, shared by both instances (sides) of a given plane
+} cm_bsp_plane_t;
+
+/**
+ * @brief BSP surfaces describe a material applied to a plane.
+ */
+typedef struct {
+	char name[32];
+	int32_t flags;
+	int32_t value;
+	struct cm_material_s *material;
+} cm_bsp_texinfo_t;
+
+/**
+ * @brief Traces are discrete movements through world space, clipped to the
+ * BSP planes they intersect. This is the basis for all collision detection
+ * within Quake.
+ */
+typedef struct {
+	/**
+	 * @brief If true, the trace started and ended within the same solid.
+	 */
+	_Bool all_solid;
+
+	/**
+	 * @brief If true, the trace started within a solid, but exited it.
+	 */
+	_Bool start_solid;
+
+	/**
+	 * @brief The fraction of the desired distance traveled (0.0 - 1.0). If
+	 * 1.0, no plane was impacted.
+	 */
+	vec_t fraction;
+
+	/**
+	 * @brief The destination position.
+	 */
+	vec3_t end;
+
+	/**
+	 * @brief The impacted plane, or empty. Note that a copy of the plane is
+	 * returned, rather than a pointer. This is because the plane may belong to
+	 * an inline BSP or the box hull of a solid entity, in which case it must
+	 * be transformed by the entity's current position.
+	 */
+	cm_bsp_plane_t plane;
+
+	/**
+	 * @brief The impacted surface, or `NULL`.
+	 */
+	cm_bsp_texinfo_t *surface;
+
+	/**
+	 * @brief The contents mask of the impacted brush, or 0.
+	 */
+	int32_t contents;
+
+	/**
+	 * @brief The impacted entity, or `NULL`.
+	 */
+	struct g_entity_s *ent; // not set by Cm_*() functions
+} cm_trace_t;
+
+typedef void ai_import_t;
+typedef void ai_export_t;
+
+typedef void (*Fs_EnumerateFunc)(const char *path, void *data);
+
 
 /**
  * @brief Server flags for g_entity_t.

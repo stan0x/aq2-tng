@@ -49,6 +49,10 @@
 #ifndef __Q_SHARED_H
 #define __Q_SHARED_H
 
+#ifdef QUETOO
+#include "quetoo/quetoo.h"
+#endif
+
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -217,6 +221,7 @@ typedef enum { qfalse = 0, qtrue } qboolean;
 #define PRINT_ALERT                     2
 
 
+#ifndef QUETOO
 // destination class for gi.multicast()
 typedef enum
 {
@@ -228,6 +233,7 @@ typedef enum
   MULTICAST_PVS_R
 }
 multicast_t;
+#endif
 
 
 /*
@@ -449,6 +455,7 @@ void Com_Printf (const char *msg, ...);
 #define CVAR_NOSET              8	// don't allow change from console at all, but can be set from the command line
 #define CVAR_LATCH              16	// save changes until server restart
 
+#ifndef QUETOO
 // nothing outside the Cvar_*() functions should modify these fields!
 typedef struct cvar_s
 {
@@ -463,6 +470,7 @@ typedef struct cvar_s
   struct cvar_s *next;
 }
 cvar_t;
+#endif
 
 #endif // CVAR
 
@@ -614,7 +622,7 @@ typedef struct
 trace_t;
 
 
-
+#ifndef QUETOO
 // pmove_state_t is the information necessary for client side movement
 // prediction
 typedef enum
@@ -628,6 +636,10 @@ typedef enum
   PM_FREEZE
 }
 pmtype_t;
+#else
+#define pmtype_t pm_type_t
+#define PM_GIB PM_DEAD
+#endif
 
 // pmove->pm_flags
 #define PMF_DUCKED              1
@@ -1366,6 +1378,7 @@ typedef enum
 entity_event_t;
 
 
+#ifndef QUETOO
 // entity_state_t is the information conveyed from the server
 // in an update message about entities that the client will
 // need to render in some way
@@ -1398,10 +1411,12 @@ typedef struct entity_state_s
 
 }
 entity_state_t;
+#endif
 
 //==============================================
 
 
+#ifndef QUETOO
 // player_state_t is the information needed in addition to pmove_state_t
 // to rendered a view.  There will only be 10 player_state_t sent each second,
 // but the number of pmove_state_t changes will be reletive to client
@@ -1433,5 +1448,6 @@ typedef struct
   short stats[MAX_STATS];	// fast status bar updates
 }
 player_state_t;
+#endif
 
 #endif
