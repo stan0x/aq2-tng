@@ -32,6 +32,8 @@ typedef enum
   SOLID_BSP			// bsp clip, touch on edge
 }
 solid_t;
+#else
+#define SOLID_BBOX SOLID_BOX
 #endif
 
 //===============================================================

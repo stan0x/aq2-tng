@@ -168,7 +168,9 @@
 
 //==============================================
 
+#ifndef QUETOO
 typedef unsigned char byte;
+#endif
 typedef enum { qfalse = 0, qtrue } qboolean;
 #define true qtrue
 #define false qfalse
@@ -244,8 +246,10 @@ multicast_t;
    ==============================================================
  */
 
+#ifndef QUETOO
 typedef float vec_t;
 typedef vec_t vec3_t[3];
+#endif
 typedef vec_t vec5_t[5];
 
 typedef int fixed4_t;
@@ -455,9 +459,12 @@ void Com_Printf (const char *msg, ...);
 #define CVAR_NOSET              8	// don't allow change from console at all, but can be set from the command line
 #define CVAR_LATCH              16	// save changes until server restart
 
-#ifndef QUETOO
 // nothing outside the Cvar_*() functions should modify these fields!
+#ifndef QUETOO
 typedef struct cvar_s
+#else
+typedef struct q2_cvar_s
+#endif
 {
   char *name;
   char *string;
@@ -469,7 +476,13 @@ typedef struct cvar_s
   float value;
   struct cvar_s *next;
 }
+#ifndef QUETOO
 cvar_t;
+#else
+q2_cvar_t;
+#ifndef QUETOO_SRC
+#define cvar_t q2_cvar_t
+#endif
 #endif
 
 #endif // CVAR
@@ -1378,7 +1391,6 @@ typedef enum
 entity_event_t;
 
 
-#ifndef QUETOO
 // entity_state_t is the information conveyed from the server
 // in an update message about entities that the client will
 // need to render in some way
@@ -1410,13 +1422,18 @@ typedef struct entity_state_s
   // are automatically cleared each frame
 
 }
+#ifndef QUETOO
 entity_state_t;
+#else
+q2_entity_state_t;
+#ifndef QUETOO_SRC
+#define entity_state_t q2_entity_state_t
+#endif
 #endif
 
 //==============================================
 
 
-#ifndef QUETOO
 // player_state_t is the information needed in addition to pmove_state_t
 // to rendered a view.  There will only be 10 player_state_t sent each second,
 // but the number of pmove_state_t changes will be reletive to client
@@ -1447,7 +1464,13 @@ typedef struct
 
   short stats[MAX_STATS];	// fast status bar updates
 }
+#ifndef QUETOO
 player_state_t;
+#else
+q2_player_state_t;
+#ifndef QUETOO_SRC
+#define player_state_t q2_player_state_t
+#endif
 #endif
 
 #endif
