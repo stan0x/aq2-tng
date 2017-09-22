@@ -339,6 +339,7 @@ typedef enum {
 	CL_CMD_CGAME, // the game may extend from here
 } cl_packet_cmd_t;
 
+/*
 // lower bits are stronger, and will eat weaker brushes completely
 #define CONTENTS_SOLID			0x1 // an eye is never valid in a solid
 #define CONTENTS_WINDOW			0x2 // translucent, but not watery
@@ -349,6 +350,7 @@ typedef enum {
 #define CONTENTS_MIST			0x40
 
 #define LAST_VISIBLE_CONTENTS	CONTENTS_MIST
+*/
 
 // remaining contents are non-visible, and don't eat brushes
 #define CONTENTS_AREA_PORTAL	0x8000
@@ -398,7 +400,7 @@ typedef enum {
  * @brief Contents masks: frequently combined contents flags.
  */
 #define MASK_ALL				(-1)
-#define MASK_SOLID				(CONTENTS_SOLID | CONTENTS_WINDOW)
+//#define MASK_SOLID				(CONTENTS_SOLID | CONTENTS_WINDOW)
 #define MASK_LIQUID				(CONTENTS_WATER | CONTENTS_LAVA | CONTENTS_SLIME)
 #define MASK_MEAT				(CONTENTS_MONSTER | CONTENTS_DEAD_MONSTER)
 #define MASK_CLIP_CORPSE		(MASK_SOLID | CONTENTS_PLAYER_CLIP)
@@ -621,7 +623,7 @@ typedef enum {
  * effects, up to 16 bits.
  */
 #define EF_NONE				(0)
-#define EF_ROTATE			(1 << 0) // rotate on z
+//#define EF_ROTATE			(1 << 0) // rotate on z
 #define EF_BOB				(1 << 1) // bob on z
 #define EF_PULSE			(1 << 2) // pulsing light effect
 #define EF_INACTIVE			(1 << 3) // inactive icon for when input is not going to game

@@ -28,6 +28,10 @@
 g_import_t quetoo_gi;
 g_export_t quetoo_ge;
 
+void InitGame( void );
+void G_RunFrame( void );
+game_export_t *GetGameAPI( game_import_t *import );
+
 /*
 ai_export_t *aix;
 
@@ -1634,7 +1638,7 @@ g_export_t *G_LoadGame(g_import_t *import) {
 	gi.centerprintf = NULL;
 	gi.sound = NULL;
 	gi.positioned_sound = NULL;
-	gi.configstring = quetoo_gi.SetConfigString;
+	gi.configstring = NULL; //quetoo_gi.SetConfigString;
 	gi.error = NULL;
 	gi.modelindex = NULL;
 	gi.soundindex = NULL;
@@ -1661,10 +1665,10 @@ g_export_t *G_LoadGame(g_import_t *import) {
 	gi.WritePosition = NULL;
 	gi.WriteDir = NULL;
 	gi.WriteAngle = NULL;
-	gi.TagMalloc = quetoo_gi.Malloc;
+	gi.TagMalloc = NULL; //quetoo_gi.Malloc;
 	gi.TagFree = quetoo_gi.Free;
 	gi.FreeTags = quetoo_gi.FreeTag;
-	gi.cvar = &quetoo_cvar;
+	gi.cvar = NULL; //&quetoo_cvar;
 	gi.cvar_set = NULL;
 	gi.cvar_forceset = NULL;
 	gi.argc = NULL;

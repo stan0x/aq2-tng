@@ -172,8 +172,10 @@
 typedef unsigned char byte;
 #endif
 typedef enum { qfalse = 0, qtrue } qboolean;
+#ifndef QUETOO
 #define true qtrue
 #define false qfalse
+#endif
 
 
 #ifndef NULL
@@ -187,8 +189,10 @@ typedef enum { qfalse = 0, qtrue } qboolean;
 #define ROLL                            2	// fall over
 
 #define MAX_STRING_CHARS                1024	// max length of a string passed to Cmd_TokenizeString
+#ifndef QUETOO
 #define MAX_STRING_TOKENS               80	// max tokens resulting from Cmd_TokenizeString
 #define MAX_TOKEN_CHARS                 128	// max length of an individual token
+#endif
 
 #define MAX_QPATH                       64	// max length of a quake game pathname
 #define MAX_OSPATH                      128	// max length of a filesystem pathname
@@ -196,12 +200,15 @@ typedef enum { qfalse = 0, qtrue } qboolean;
 //
 // per-level limits
 //
-#define MAX_CLIENTS                     256	// absolute limit
 #define MAX_EDICTS                      1024	// must change protocol to increase more
 #define MAX_LIGHTSTYLES                 256
 #define MAX_MODELS                      256	// these are sent over the net as bytes
 #define MAX_SOUNDS                      256	// so they cannot be blindly increased
 #define MAX_IMAGES                      256
+
+#ifndef QUETOO
+
+#define MAX_CLIENTS                     256	// absolute limit
 #define MAX_ITEMS                       256
 #define MAX_GENERAL                     (MAX_CLIENTS*2)	// general config strings (from 3.20 -FB)
 
@@ -212,6 +219,7 @@ typedef enum { qfalse = 0, qtrue } qboolean;
 #define PRINT_HIGH                      2	// critical messages
 #define PRINT_CHAT                      3	// chat messages
 
+#endif
 
 
 #define ERR_FATAL                       0	// exit the entire game with a popup window
@@ -453,11 +461,17 @@ void Com_Printf (const char *msg, ...);
 #ifndef CVAR
 #define CVAR
 
+#ifndef QUETOO
 #define CVAR_ARCHIVE            1	// set to cause it to be saved to vars.rc
 #define CVAR_USERINFO           2	// added to userinfo  when changed
 #define CVAR_SERVERINFO         4	// added to serverinfo when changed
 #define CVAR_NOSET              8	// don't allow change from console at all, but can be set from the command line
 #define CVAR_LATCH              16	// save changes until server restart
+#else
+#define CVAR_USERINFO CVAR_USER_INFO
+#define CVAR_SERVERINFO CVAR_SERVER_INFO
+#define CVAR_NOSET CVAR_NO_SET
+#endif
 
 // nothing outside the Cvar_*() functions should modify these fields!
 #ifndef QUETOO

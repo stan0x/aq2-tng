@@ -260,6 +260,7 @@
 // This is the PG Bund Edition V1.25 with all stuff laying around here...
 //
 //-----------------------------------------------------------------------------
+#pragma once
 
 #include <ctype.h>
 
