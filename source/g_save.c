@@ -425,6 +425,7 @@ void InitGame( void )
 	llsound = gi.cvar( "llsound", "0", 0 );
 	loud_guns = gi.cvar( "loud_guns", "1", 0 );
 	sync_guns = gi.cvar( "sync_guns", "1", 0 );
+	silentwalk = gi.cvar( "silentwalk", "0", 0 );
 	use_cvote = gi.cvar( "use_cvote", "0", 0 );	// Removed it from Serverinfo
 	new_irvision = gi.cvar( "new_irvision", "0", 0 );
 	use_rewards = gi.cvar( "use_rewards", "1", 0 );
@@ -444,6 +445,7 @@ void InitGame( void )
 	matchmode = gi.cvar( "matchmode", "0", CVAR_SERVERINFO | CVAR_LATCH );
 	hearall = gi.cvar( "hearall", "0", 0 );	// used in matchmode
 	deadtalk = gi.cvar( "deadtalk", "0", 0 );
+	force_skin = gi.cvar( "force_skin", "", 0 );
 
 	teamdm = gi.cvar( "teamdm", "0", CVAR_LATCH );
 	teamdm_respawn = gi.cvar( "teamdm_respawn", "2", 0 );

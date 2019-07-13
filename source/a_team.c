@@ -799,8 +799,15 @@ void AssignSkin (edict_t * ent, const char *s, qboolean nickChanged)
 	int playernum = ent - g_edicts - 1;
 	char *p;
 	char t[MAX_SKINLEN], skin[64] = "\0";
+	const char *default_skin = "male/grunt";
 
-	if (ctf->value && !matchmode->value)
+	if( force_skin->string[0] )
+	{
+		s = force_skin->string;
+		default_skin = force_skin->string;
+	}
+
+	if( (ctf->value || dom->value) && ! matchmode->value )
 	{
 		// forcing CTF model
 		if(ctf_model->string[0]) {
@@ -825,7 +832,7 @@ void AssignSkin (edict_t * ent, const char *s, qboolean nickChanged)
 			Com_sprintf(skin, sizeof(skin), "%s\\%s%s", ent->client->pers.netname, t, CTF_TEAM2_SKIN);
 			break;
 		default:
-			Com_sprintf(skin, sizeof(skin), "%s\\%s", ent->client->pers.netname, "male/grunt");
+			Com_sprintf(skin, sizeof(skin), "%s\\%s", ent->client->pers.netname, default_skin);
 			break;
 		}
 	}
@@ -839,7 +846,7 @@ void AssignSkin (edict_t * ent, const char *s, qboolean nickChanged)
 			Com_sprintf(skin, sizeof(skin), "%s\\%s", ent->client->pers.netname, teams[ent->client->resp.team].skin);
 			break;
 		default:
-			Com_sprintf(skin, sizeof(skin), "%s\\%s", ent->client->pers.netname, (teamplay->value ? "male/grunt" : s));
+			Com_sprintf(skin, sizeof(skin), "%s\\%s", ent->client->pers.netname, (teamplay->value ? default_skin : s));
 			break;
 		}
 	}
