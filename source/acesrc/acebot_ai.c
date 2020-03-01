@@ -136,12 +136,8 @@ void ACEAI_Think (edict_t *self)
 	if(VectorLength(self->velocity) > 37) //
 		self->suicide_timeout = level.framenum + 10.0 * HZ;
 
-
 	if( self->suicide_timeout < level.framenum && !teamplay->value )
-	{
-		self->health = 0;
-		player_die (self, self, self, 100000, vec3_origin);
-	}
+		killPlayer( self, true );
 
 	// Find any short range goal
 	ACEAI_PickShortRangeGoal(self);
@@ -292,6 +288,9 @@ void ACEAI_Think (edict_t *self)
 //AQ2 END
 
 	//debug_printf("State: %d\n",self->state);
+
+	// Remember where we were, to check if we got stuck.
+	VectorCopy( self->s.origin, self->lastPosition );
 
 	// set approximate ping
 	ucmd.msec = 1000 / BOT_FPS;
@@ -704,31 +703,59 @@ qboolean ACEAI_FindEnemy(edict_t *self, int *total)
 		{
 // RiEvEr
 			// Now we assess this enemy
+			qboolean visible = infront( self, players[i] );
 			VectorSubtract(self->s.origin, players[i]->s.origin, dist);
 			weight = VectorLength( dist );
 
-			// Can we hear their weapon firing?
-			qboolean weapon_loud = false;
-			if( players[i]->client->weaponstate == WEAPON_FIRING || players[i]->client->weaponstate == WEAPON_BURSTING )
+			if( ! visible )
 			{
-				switch( players[i]->client->weapon->typeNum )
+				// Can we hear their footsteps?
+				visible = (weight < 300) && !INV_AMMO( players[i], SLIP_NUM );
+			}
+
+			if( ! visible )
+			{
+				// Can we hear their weapon firing?
+				if( players[i]->client->weaponstate == WEAPON_FIRING || players[i]->client->weaponstate == WEAPON_BURSTING )
 				{
-					case DUAL_NUM:
-					case M4_NUM:
-					case M3_NUM:
-					case HC_NUM:
-						weapon_loud = true;
-						break;
-					case KNIFE_NUM:
-					case GRENADE_NUM:
-						break;
-					default:
-						weapon_loud = !INV_AMMO( players[i], SIL_NUM );
+					switch( players[i]->client->weapon->typeNum )
+					{
+						case DUAL_NUM:
+						case M4_NUM:
+						case M3_NUM:
+						case HC_NUM:
+							visible = true;
+							break;
+						case KNIFE_NUM:
+						case GRENADE_NUM:
+							break;
+						default:
+							visible = !INV_AMMO( players[i], SIL_NUM );
+					}
 				}
 			}
 
-			// Can we see this enemy, or are they making noise that we shouldn't ignore?
-			if( infront( self, players[i] ) || weapon_loud || ((weight < 300) && !INV_AMMO( players[i], SLIP_NUM )) )
+			if( ! visible )
+			{
+				// Can we see their flashlight?
+				edict_t *fl = players[i]->client->flashlight;
+				visible = fl && infront( self, fl );
+				if( fl && ! visible )
+				{
+					VectorSubtract( self->s.origin, fl->s.origin, dist );
+					visible = (VectorLength(dist) < 100);
+				}
+			}
+
+			if( ! visible )
+			{
+				// Can we see their laser sight?
+				edict_t *laser = players[i]->client->lasersight;
+				visible = laser && (laser->s.modelindex != level.model_null) && infront( self, laser ) && ai_visible( self, laser );
+			}
+
+			// Can we see this enemy, or are they calling attention to themselves?
+			if( visible )
 			{
 				total+=1;
 
@@ -752,7 +779,7 @@ qboolean ACEAI_FindEnemy(edict_t *self, int *total)
 		return true;
 	}
 	// Check if we've been shot from behind or out of view
-	if( self->client->attacker && self->client->attacker->inuse )
+	if( self->client->attacker && self->client->attacker->inuse && (self->client->attacker != self) )
 	{
 		// Check if it was recent
 		if( self->client->push_timeout > 0)
@@ -807,6 +834,19 @@ qboolean ACEAI_CheckShot(edict_t *self)
 }
 
 ///////////////////////////////////////////////////////////////////////
+// Choose the sniper zoom when allowed
+///////////////////////////////////////////////////////////////////////
+void _SetSniper( edict_t *ent, int zoom );
+void ACEAI_SetSniper( edict_t *self, int zoom )
+{
+	if( (self->client->weaponstate != WEAPON_FIRING)
+	&&  (self->client->weaponstate != WEAPON_BUSY)
+	&& ! self->client->bandaging
+	&& ! self->client->bandage_stopped )
+		_SetSniper( self, zoom );
+}
+
+///////////////////////////////////////////////////////////////////////
 // Choose the best weapon for bot (simplified)
 // Modified by Werewolf to use sniper zoom
 ///////////////////////////////////////////////////////////////////////
@@ -831,28 +871,33 @@ qboolean ACEAI_ChooseWeapon(edict_t *self)
 	range = VectorLength(v);
 		
 
-	// Longest range 
-	if(range > 1000)
+	// Extreme range
+	if( range > 1300 )
 	{
 		if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
 		{
-			if (self->client->resp.sniper_mode!=SNIPER_2X)
-			{
-			gi.sound(self, CHAN_ITEM, gi.soundindex("misc/lensflik.wav"), 1, ATTN_NORM, 0);
-			self->client->resp.sniper_mode = SNIPER_2X;
-			self->client->desired_fov = 45;
-			}
+			ACEAI_SetSniper( self, 2 );
+			return (true);
+		}
+	}
+
+	// Longest range 
+	if(range > 1000)
+	{
+		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
+			return (true);
+
+		if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
+		{
+			ACEAI_SetSniper( self, 2 );
 			return (true);
 		}
 		
-		if(ACEIT_ChangeM3SpecialWeapon(self,FindItem(M3_NAME)))
+		if( INV_AMMO(self,SIL_NUM) && ACEIT_ChangeMK23SpecialWeapon(self,FindItem(MK23_NAME)) )
 			return (true);
-		
+
 		if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
 			return (true);
-		
-		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
-   		   return (true);
 
 		if(ACEIT_ChangeMK23SpecialWeapon(self,FindItem(MK23_NAME)))
    		   return (true);
@@ -861,36 +906,51 @@ qboolean ACEAI_ChooseWeapon(edict_t *self)
 	// Longer range 
 	if(range > 700)
 	{		
-		if(ACEIT_ChangeM3SpecialWeapon(self,FindItem(M3_NAME)))
-			return (true);
-		
+		if( INV_AMMO(self,SIL_NUM) )
+		{
+			if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
+				return (true);
+
+			if(ACEIT_ChangeMK23SpecialWeapon(self,FindItem(MK23_NAME)))
+				return (true);
+		}
+
 		if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
 			return (true);
 		
 		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
+			return (true);
+
+		if(ACEIT_ChangeM3SpecialWeapon(self,FindItem(M3_NAME)))
    		   return (true);
 
 		if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
 		{
-			if (self->client->resp.sniper_mode!=SNIPER_2X)
-			{
-			gi.sound(self, CHAN_ITEM, gi.soundindex("misc/lensflik.wav"), 1, ATTN_NORM, 0);
-			self->client->resp.sniper_mode = SNIPER_2X;
-			self->client->desired_fov = 45;
-			}
+			ACEAI_SetSniper( self, 2 );
 			return (true);
 		}
 	
 		if(ACEIT_ChangeMK23SpecialWeapon(self,FindItem(MK23_NAME)))
    		   return (true);
 
+		if(ACEIT_ChangeWeapon(self,FindItem(GRENADE_NAME)))
+		{
+			self->client->pers.grenade_mode = 2;
+			return (true);
+		}
 	}
 	
 	// Long range 
 	if(range > 500)
 	{		
-		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
-   		   return (true);
+		if( INV_AMMO(self,LASER_NUM) )
+		{
+			if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
+				return (true);
+
+			if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
+				return (true);
+		}
 
 		if(ACEIT_ChangeM3SpecialWeapon(self,FindItem(M3_NAME)))
 			return (true);
@@ -898,14 +958,12 @@ qboolean ACEAI_ChooseWeapon(edict_t *self)
 		if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
 			return (true);
 		
+		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
+			return (true);
+
 		if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
 		{
-			if (self->client->resp.sniper_mode!=SNIPER_1X)
-			{
-			gi.sound(self, CHAN_ITEM, gi.soundindex("misc/lensflik.wav"), 1, ATTN_NORM, 0);
-			self->client->resp.sniper_mode = SNIPER_1X;
-			self->client->desired_fov = 90;
-			}
+			ACEAI_SetSniper( self, 2 );
 			return (true);
 		}
 	
@@ -913,23 +971,41 @@ qboolean ACEAI_ChooseWeapon(edict_t *self)
    		   return (true);
 
 		if(ACEIT_ChangeWeapon(self,FindItem(GRENADE_NAME)))
+		{
+			self->client->pers.grenade_mode = 1;
 			return (true);
+		}
 	}
 	
 	// Medium range 
 	if(range > 200)
 	{		
-		if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
+		if( INV_AMMO(self,SLIP_NUM) && ACEIT_ChangeHCSpecialWeapon(self,FindItem(HC_NAME)) )
 			return (true);
-		
-		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
-   		   return (true);
+
+		if( INV_AMMO(self,LASER_NUM) )
+		{
+			if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
+				return (true);
+
+			if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
+				return (true);
+		}
 
 		if(ACEIT_ChangeM3SpecialWeapon(self,FindItem(M3_NAME)))
 			return (true);
 		
-		if(ACEIT_ChangeWeapon(self,FindItem(GRENADE_NAME)))
+		if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
+   		   return (true);
+
+		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
 			return (true);
+		
+		if(ACEIT_ChangeWeapon(self,FindItem(GRENADE_NAME)))
+		{
+			self->client->pers.grenade_mode = 1;
+			return (true);
+		}
 
 		if(ACEIT_ChangeDualSpecialWeapon(self,FindItem(DUAL_NAME)))
 			return (true);
@@ -937,14 +1013,13 @@ qboolean ACEAI_ChooseWeapon(edict_t *self)
 		if(ACEIT_ChangeMK23SpecialWeapon(self,FindItem(MK23_NAME)))
    		   return (true);
 
+		// Raptor007: Throw knives at medium range if we have extras.
+		if( (INV_AMMO(self,KNIFE_NUM) >= 2) && ACEIT_ChangeWeapon(self,FindItem(KNIFE_NAME)) )
+			return (true);
+
 		if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
 		{
-			if (self->client->resp.sniper_mode!=SNIPER_1X)
-			{
-			gi.sound(self, CHAN_ITEM, gi.soundindex("misc/lensflik.wav"), 1, ATTN_NORM, 0);
-			self->client->resp.sniper_mode = SNIPER_1X;
-			self->client->desired_fov = 90;
-			}
+			ACEAI_SetSniper( self, 1 );
 			return (true);
 		}
 	
@@ -954,10 +1029,19 @@ qboolean ACEAI_ChooseWeapon(edict_t *self)
 	if(ACEIT_ChangeHCSpecialWeapon(self,FindItem(HC_NAME)))
 		return (true);
 	
-	if(ACEIT_ChangeDualSpecialWeapon(self,FindItem(DUAL_NAME)))
-		return (true);
+	if( INV_AMMO(self,LASER_NUM) )
+	{
+		if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
+			return (true);
+
+		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
+			return (true);
+	}
 
 	if(ACEIT_ChangeM3SpecialWeapon(self,FindItem(M3_NAME)))
+		return (true);
+
+	if(ACEIT_ChangeDualSpecialWeapon(self,FindItem(DUAL_NAME)))
 		return (true);
 	
 	if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
@@ -967,7 +1051,10 @@ qboolean ACEAI_ChooseWeapon(edict_t *self)
    	   return (true);
 	
 	if(ACEIT_ChangeWeapon(self,FindItem(GRENADE_NAME)))
+	{
+		self->client->pers.grenade_mode = 0;
    	   return (true);
+	}
 
 	if(ACEIT_ChangeMK23SpecialWeapon(self,FindItem(MK23_NAME)))
    	   return (true);
@@ -976,15 +1063,10 @@ qboolean ACEAI_ChooseWeapon(edict_t *self)
    	   return (true);
 
 	if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
-		{
-			if (self->client->resp.sniper_mode!=SNIPER_1X)
-			{
-			gi.sound(self, CHAN_ITEM, gi.soundindex("misc/lensflik.wav"), 1, ATTN_NORM, 0);
-			self->client->resp.sniper_mode = SNIPER_1X;
-			self->client->desired_fov = 90;
-			}
-			return (true);
-		}
+	{
+		ACEAI_SetSniper( self, 1 );
+		return (true);
+	}
 
 
 	
