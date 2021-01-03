@@ -163,28 +163,21 @@ void P_DamageFeedback (edict_t * player)
 	{
 		static int i;
 
-		client->anim_priority = ANIM_PAIN;
 		if (client->ps.pmove.pm_flags & PMF_DUCKED)
-		{
-			player->s.frame = FRAME_crpain1 - 1;
-			client->anim_end = FRAME_crpain4;
-		}
+			SetAnimation( player, FRAME_crpain1 - 1, FRAME_crpain4, ANIM_PAIN );
 		else
 		{
 			i = (i + 1) % 3;
 			switch (i)
 			{
 			case 0:
-				player->s.frame = FRAME_pain101 - 1;
-				client->anim_end = FRAME_pain104;
+				SetAnimation( player, FRAME_pain101 - 1, FRAME_pain104, ANIM_PAIN );
 				break;
 			case 1:
-				player->s.frame = FRAME_pain201 - 1;
-				client->anim_end = FRAME_pain204;
+				SetAnimation( player, FRAME_pain201 - 1, FRAME_pain204, ANIM_PAIN );
 				break;
 			case 2:
-				player->s.frame = FRAME_pain301 - 1;
-				client->anim_end = FRAME_pain304;
+				SetAnimation( player, FRAME_pain301 - 1, FRAME_pain304, ANIM_PAIN );
 				break;
 			}
 		}
@@ -362,7 +355,7 @@ void SV_CalcViewOffset (edict_t * ent)
 	ratio = (ent->client->fall_time - level.time) / FALL_TIME;
 	if (ratio < 0)
 		ratio = 0;
-	v[2] -= ratio * ent->client->fall_value * 0.4;
+	v[2] -= ratio * ent->client->fall_value * 0.4f;
 
 	// add bob height
 	bob = bobfracsin * xyspeed * bob_up->value;
@@ -573,6 +566,32 @@ void SV_CalcBlend (edict_t * ent)
 
 
 /*
+========
+OnLadder
+========
+*/
+qboolean OnLadder( edict_t *ent )
+{
+	float yaw_rad = 0;
+	vec3_t fwd = {0}, end = {0};
+	trace_t tr;
+
+	if( ! IS_ALIVE(ent) )
+		return false;
+
+	yaw_rad = DEG2RAD(ent->s.angles[YAW]);
+	fwd[0] = cos(yaw_rad);
+	fwd[1] = sin(yaw_rad);
+
+	VectorMA( ent->s.origin, 1, fwd, end );
+
+	tr = gi.trace( ent->s.origin, ent->mins, ent->maxs, end, ent, MASK_PLAYERSOLID );
+
+	return ((tr.fraction < 1) && (tr.contents & CONTENTS_LADDER));
+}
+
+
+/*
 =================
 P_FallingDamage
 =================
@@ -588,6 +607,9 @@ void P_FallingDamage (edict_t * ent)
 
 	VectorCopy( ent->client->oldvelocity, oldvelocity );
 	VectorCopy( ent->velocity, ent->client->oldvelocity );
+
+	ent->client->old_ladder = ent->client->ladder;
+	ent->client->ladder = OnLadder(ent);
 
 	if (lights_camera_action || ent->client->uvTime > 0)
 		return;
@@ -632,6 +654,10 @@ void P_FallingDamage (edict_t * ent)
 
 	if (delta < 15)
 	{
+		// Raptor007: Don't make footsteps when climbing down ladders.
+		if( ent->client->old_ladder )
+			return;
+
 		// zucc look for slippers to avoid noise
 		if(!INV_AMMO(ent, SLIP_NUM))
 			ent->s.event = EV_FOOTSTEP;
@@ -679,8 +705,15 @@ void P_FallingDamage (edict_t * ent)
 		// zucc scale this up
 		damage *= 10;
 		VectorSet (dir, 0, 0, 1);
+
+		if (jump->value)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "Fall Damage: %d\n", damage);
+			ent->client->resp.jmp_falldmglast = damage;
+		} else {
 		T_Damage (ent, world, world, dir, ent->s.origin, vec3_origin,
 			damage, 0, 0, MOD_FALLING);
+		}
 	}
 }
 
@@ -950,7 +983,8 @@ void G_SetClientEvent (edict_t * ent)
 	//if (!FRAMESYNC)
 	//	return;
 
-	if (ent->groundentity && xyspeed > 225)
+	int footstep_speed = silentwalk->value ? 290 : 225;
+	if (ent->groundentity && (xyspeed > footstep_speed))
 	{
 		//zucc added item check to see if they have slippers
 		if ((int)(current_client->bobtime + bobmove) != bobcycle && !INV_AMMO(ent, SLIP_NUM))
@@ -969,6 +1003,15 @@ void G_SetClientSound (edict_t * ent)
 		ent->s.sound = level.snd_fry;
 	else
 		ent->s.sound = 0;
+}
+
+
+void SetAnimation( edict_t *ent, int frame, int anim_end, int anim_priority )
+{
+	ent->s.frame = frame;
+	ent->client->anim_end = anim_end;
+	ent->client->anim_priority = anim_priority;
+	ent->client->anim_started = level.framenum;
 }
 
 /*
@@ -998,15 +1041,20 @@ void G_SetClientFrame (edict_t * ent)
 	else
 		run = false;
 
-	// check for stand/duck and stop/go transitions
-	if (duck != client->anim_duck && client->anim_priority < ANIM_DEATH)
-		goto newanim;
-	if (run != client->anim_run && client->anim_priority == ANIM_BASIC)
-		goto newanim;
-	if (!ent->groundentity && client->anim_priority <= ANIM_WAVE)
-		goto newanim;
+	qboolean anim_framesync = level.framenum % game.framediv == client->anim_started % game.framediv;
 
-	if( level.framenum % game.framediv != client->anim_framesync )
+	// check for stand/duck and stop/go transitions
+	if( anim_framesync || (level.framenum >= client->anim_started + game.framediv) )
+	{
+		if (duck != client->anim_duck && client->anim_priority < ANIM_DEATH)
+			goto newanim;
+		if (run != client->anim_run && client->anim_priority == ANIM_BASIC)
+			goto newanim;
+		if (!ent->groundentity && client->anim_priority <= ANIM_WAVE)
+			goto newanim;
+	}
+
+	if( ! anim_framesync )
 		return;
 
 	// zucc vwep
@@ -1037,7 +1085,7 @@ void G_SetClientFrame (edict_t * ent)
 	}
 
 newanim:
-	client->anim_framesync = level.framenum % game.framediv;
+	client->anim_started = level.framenum;
 
 	// return to either a running or standing frame
 	client->anim_priority = ANIM_BASIC;
@@ -1271,7 +1319,7 @@ void ClientEndServerFrame (edict_t * ent)
 	}
 
 	//FIREBLADE - Unstick avoidance stuff.
-	if (ent->solid == SOLID_TRIGGER && !lights_camera_action)
+	if (ent->solid == SOLID_TRIGGER && !lights_camera_action && !jump->value)
 	{
 		edict_t *overlap;
 		if ((overlap = FindOverlap(ent, NULL)) == NULL)
@@ -1318,7 +1366,7 @@ void ClientEndServerFrame (edict_t * ent)
 	//
 	//if (FRAMESYNC)
 	{
-		xyspeed = sqrt(ent->velocity[0]*ent->velocity[0] + ent->velocity[1]*ent->velocity[1]);
+		xyspeed = sqrtf(ent->velocity[0]*ent->velocity[0] + ent->velocity[1]*ent->velocity[1]);
 
 		if (xyspeed < 5 || ent->solid == SOLID_NOT)
 		{
@@ -1344,7 +1392,7 @@ void ClientEndServerFrame (edict_t * ent)
 		current_client->bobtime += bobmove;
 
 		bobcycle = (int) current_client->bobtime;
-		bobfracsin = fabs (sin (current_client->bobtime * M_PI));
+		bobfracsin = fabsf (sinf (current_client->bobtime * M_PI));
 	}
 
 	// detect hitting the floor

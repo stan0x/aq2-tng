@@ -411,7 +411,7 @@ void VerifyHeadShot(vec3_t point, vec3_t dir, float height, vec3_t newpoint)
 #define STOMACH_DAMAGE (height/1.8) - abs(targ->mins[2])
 #define CHEST_DAMAGE (height/1.4) - abs(targ->mins[2])
 
-#define HEAD_HEIGHT 12.0
+#define HEAD_HEIGHT 12.0f
 
 void
 T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
@@ -532,7 +532,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 					Stats_AddHit( attacker, mod, (gotArmor) ? LOC_KVLR_HELMET : LOC_HDAM );
 
 					//AQ2:TNG END
-					if (!friendlyFire)
+					if (!friendlyFire && !in_warmup)
 					{
 						attacker->client->resp.streakHS++;
 						if (attacker->client->resp.streakHS > attacker->client->resp.streakHSHighest)

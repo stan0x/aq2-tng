@@ -799,8 +799,15 @@ void AssignSkin (edict_t * ent, const char *s, qboolean nickChanged)
 	int playernum = ent - g_edicts - 1;
 	char *p;
 	char t[MAX_SKINLEN], skin[64] = "\0";
+	const char *default_skin = "male/grunt";
 
-	if (ctf->value && !matchmode->value)
+	if( force_skin->string[0] )
+	{
+		s = force_skin->string;
+		default_skin = force_skin->string;
+	}
+
+	if( (ctf->value || dom->value) && ! matchmode->value )
 	{
 		// forcing CTF model
 		if(ctf_model->string[0]) {
@@ -825,17 +832,7 @@ void AssignSkin (edict_t * ent, const char *s, qboolean nickChanged)
 			Com_sprintf(skin, sizeof(skin), "%s\\%s%s", ent->client->pers.netname, t, CTF_TEAM2_SKIN);
 			break;
 		default:
-			Com_sprintf(skin, sizeof(skin), "%s\\%s", ent->client->pers.netname, "male/grunt");
-			break;
-		}
-	}
-	if (force_skin->value)
-	{
-		switch (ent->client->resp.team)
-		{
-			
-		default:
-			Com_sprintf(skin, sizeof(skin), "%s\\%s", ent->client->pers.netname, "male/ctf_r");
+			Com_sprintf(skin, sizeof(skin), "%s\\%s", ent->client->pers.netname, default_skin);
 			break;
 		}
 	}
@@ -849,7 +846,7 @@ void AssignSkin (edict_t * ent, const char *s, qboolean nickChanged)
 			Com_sprintf(skin, sizeof(skin), "%s\\%s", ent->client->pers.netname, teams[ent->client->resp.team].skin);
 			break;
 		default:
-			Com_sprintf(skin, sizeof(skin), "%s\\%s", ent->client->pers.netname, (teamplay->value ? "male/grunt" : s));
+			Com_sprintf(skin, sizeof(skin), "%s\\%s", ent->client->pers.netname, (teamplay->value ? default_skin : s));
 			break;
 		}
 	}
@@ -1428,6 +1425,8 @@ int TeamHasPlayers (int team)
 	return players;
 }
 
+int _numclients( void );  // a_vote.c
+
 qboolean BothTeamsHavePlayers()
 {
 	int players[TEAM_TOP] = { 0 }, i, teamsWithPlayers;
@@ -1440,6 +1439,9 @@ qboolean BothTeamsHavePlayers()
 
 	if (use_tourney->value)
 		return (LastOpponent > 1);
+
+	if( ! _numclients() )
+		return false;
 
 	for (i = 0; i < game.maxclients; i++)
 	{
@@ -2847,21 +2849,21 @@ void A_ScoreboardMessage (edict_t * ent, edict_t * killer)
 			cl = sortedClients[i];
 			cl_ent = g_edicts + 1 + (cl - game.clients);
 
-			snprintf( team_buf,   6, " %c%c%c ", (cl->resp.team ? (cl->resp.team + '0') : ' '), (IS_CAPTAIN(cl_ent) ? 'C' : ' '), (cl->resp.subteam ? 'S' : ' ') );
+			Com_sprintf( team_buf,   6, " %c%c%c ", (cl->resp.team ? (cl->resp.team + '0') : ' '), (IS_CAPTAIN(cl_ent) ? 'C' : ' '), (cl->resp.subteam ? 'S' : ' ') );
 			int minutes = (level.framenum - cl->resp.enterframe) / (60 * HZ);
 			if( minutes < 60 )
-				snprintf( time_buf, 6, " %4i", minutes );
+				Com_sprintf( time_buf, 6, " %4i", minutes );
 			else if( minutes < 600 )
-				snprintf( time_buf, 6, " %1i:%02i", minutes / 60, minutes % 60 );
+				Com_sprintf( time_buf, 6, " %1i:%02i", minutes / 60, minutes % 60 );
 			else
-				snprintf( time_buf, 6, " %3ih", min( 999, minutes / 60 ) );
-			snprintf( ping_buf,   6, " %4i", min( 9999, cl->ping ) );
-			snprintf( caps_buf,   6, " %4i", min( 9999, cl->resp.ctf_caps ) );
-			snprintf( score_buf,  7, " %5i", min( 99999, cl->resp.score) );
-			snprintf( kills_buf,  7, " %5i", min( 99999, cl->resp.kills) );
-			snprintf( deaths_buf, 8, " %6i", min( 999999, cl->resp.deaths) );
-			snprintf( damage_buf, 8, " %6i", min( 999999, cl->resp.damage_dealt) );
-			snprintf( acc_buf   , 5, " %3.f", cl->resp.shotsTotal ? (double) cl->resp.hitsTotal * 100.0 / (double) cl->resp.shotsTotal : 0. );
+				Com_sprintf( time_buf, 6, " %3ih", min( 999, minutes / 60 ) );
+			Com_sprintf( ping_buf,   6, " %4i", min( 9999, cl->ping ) );
+			Com_sprintf( caps_buf,   6, " %4i", min( 9999, cl->resp.ctf_caps ) );
+			Com_sprintf( score_buf,  7, " %5i", min( 99999, cl->resp.score) );
+			Com_sprintf( kills_buf,  7, " %5i", min( 99999, cl->resp.kills) );
+			Com_sprintf( deaths_buf, 8, " %6i", min( 999999, cl->resp.deaths) );
+			Com_sprintf( damage_buf, 8, " %6i", min( 999999, cl->resp.damage_dealt) );
+			Com_sprintf( acc_buf   , 5, " %3.f", cl->resp.shotsTotal ? (double) cl->resp.hitsTotal * 100.0 / (double) cl->resp.shotsTotal : 0. );
 
 			sprintf( string + strlen(string), "yv %d string \"%s%-15s%s%s%s%s%s%s%s%s\"",
 				line_y,
