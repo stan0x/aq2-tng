@@ -644,7 +644,7 @@ IRC_printf (int type, char *fmt, ... )
       topic[tpos] = 0;
       va_end(ap);
       // print it
-      sprintf (outbuf, "PRIVMSG %s :%s\n", irc_data.ircchannel, message);
+      //sprintf (outbuf, "PRIVMSG %s :%s\n", irc_data.ircchannel, message);
       if (ircdebug->value)
 	gi.dprintf ("IRC: >> %s", outbuf);
       send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
