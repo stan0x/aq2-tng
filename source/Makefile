@@ -21,7 +21,7 @@ VERSION += $(GIT_REV)
 FILE_VERSION:=$(FILE_VERSION)~$(GIT_REV)
 endif
 
-CC?=gcc
+CC=gcc-7
 BASE_CFLAGS=-Wall -Wno-unused-result -Wno-format-truncation -fno-strict-aliasing -DC_ONLY -DVERSION="\"$(VERSION)\""
 
 ifdef WEXTRA
