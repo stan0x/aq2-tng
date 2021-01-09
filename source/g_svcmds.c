@@ -511,6 +511,15 @@ void SVCmd_SoftQuit_f (void)
 
 void SVCmd_Slap_f (void)
 {
+	const char *name = gi.argv(2);
+	size_t name_len = strlen(name);
+	int damage = atoi(gi.argv(3));
+	float power = (gi.argc() >= 5) ? atof(gi.argv(4)) : 100.f;
+	vec3_t slap_dir = {0.f,0.f,1.f}, slap_normal = {0.f,0.f,-1.f};
+	qboolean found_victim = false;
+	size_t i = 0;
+	int user_id = name_len ? (atoi(name) + 1) : 0;
+
 	if( gi.argc() < 3 )
 	{
 		gi.cprintf( NULL, PRINT_HIGH, "Usage: sv slap <name/id> [<damage>] [<power>]\n" );
@@ -522,15 +531,6 @@ void SVCmd_Slap_f (void)
 		return;
 	}
 
-	const char *name = gi.argv(2);
-	size_t name_len = strlen(name);
-	int damage = atoi(gi.argv(3));
-	float power = (gi.argc() >= 5) ? atof(gi.argv(4)) : 100.f;
-	vec3_t slap_dir = {0.f,0.f,1.f}, slap_normal = {0.f,0.f,-1.f};
-	qboolean found_victim = false;
-	size_t i = 0;
-	int user_id = name_len ? (atoi(name) + 1) : 0;
-
 	// See if we're slapping by user ID.
 	for( i = 0; i < name_len; i ++ )
 	{
@@ -538,10 +538,10 @@ void SVCmd_Slap_f (void)
 			user_id = 0;
 	}
 
-	for( i = 0; i < maxclients->value ; i ++ )
+	for( i = 1; i <= game.maxclients; i ++ )
 	{
-		edict_t *ent = g_edicts + i + 1;
-		if( ent->inuse && ( (user_id == i + 1) || ((! user_id) && (Q_strnicmp( ent->client->pers.netname, name, name_len ) == 0)) ) )
+		edict_t *ent = g_edicts + i;
+		if( ent->inuse && ( (user_id == i) || ((! user_id) && (Q_strnicmp( ent->client->pers.netname, name, name_len ) == 0)) ) )
 		{
 			found_victim = true;
 			if( IS_ALIVE(ent) )
