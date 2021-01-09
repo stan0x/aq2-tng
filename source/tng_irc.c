@@ -641,11 +641,10 @@ IRC_printf (int type, char *fmt, ... )
       topic[tpos] = 0;
       va_end(ap);
       // print it
-<<<<<<< HEAD
       //sprintf (outbuf, "PRIVMSG %s :%s\n", irc_data.ircchannel, message);
-=======
+
       Com_sprintf (outbuf, sizeof(outbuf), "PRIVMSG %s :%s\n", irc_data.ircchannel, message);
->>>>>>> e5d10d564c8301366493c184f29f67a334904191
+
       if (ircdebug->value)
 	gi.dprintf ("IRC: >> %s", outbuf);
       send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);

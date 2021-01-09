@@ -51,7 +51,6 @@ ifneq (,$(findstring __arm,__$(MACHINE)))
 ARCH=arm
 endif
 
-<<<<<<< HEAD
 # If machine starts with aarch64 raspberry pi 4  gameaarch64.so.
 ifneq (,$(findstring __aarch64,__$(MACHINE)))
 ARCH=aarch64
@@ -67,8 +66,6 @@ ARCH=i386
 CFLAGS+=-m32
 endif
 
-=======
->>>>>>> e5d10d564c8301366493c184f29f67a334904191
 DO_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 DO_LINK=$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(GAME_OBJS) $(SHLIBLIBS)
 
@@ -84,11 +81,14 @@ CFLAGS+=-DWIN32
 ARCH=x86
 SHLIBEXT=dll
 SHLIBLIBS=-lws2_32
+CC=i686-w64-mingw32-gcc
 else
 CFLAGS+=-fPIC
 endif
 
 ifdef WIN64
+SHLIBLIBS=-lws2_32
+SHLIBEXT=dll
 CC=x86_64-w64-mingw32-gcc
 CFLAGS+=-DWIN64 -m64
 ARCH=x86_64
@@ -97,7 +97,6 @@ endif
 ifeq ($(ARCH),x86)
 CFLAGS+=-m32
 endif
-
 
 #############################################################################
 # SETUP AND BUILD
