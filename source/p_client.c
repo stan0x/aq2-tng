@@ -655,6 +655,11 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 	int loc;
 	char *message;
 	char *message2;
+	//stan0x added
+	char *sweapon;
+	char *victem_id = Info_ValueForKey( self->client->pers.userinfo, "discord_id" );
+	char *attacker_id = Info_ValueForKey( attacker->client->pers.userinfo, "discord_id" );
+	//stan0x added
 	char death_msg[1024];	// enough in all situations? -FB
 	qboolean friendlyFire;
 	char *special_message = NULL;
@@ -712,6 +717,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			message = "is done with the world";
 			break;
 		case MOD_FALLING:
+			sweapon = "MOD_FALLING";
 			if( self->client->push_timeout )
 				special_message = "was taught how to fly by";
 			//message = "hit the ground hard, real hard";
@@ -820,6 +826,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 	{
 		switch (mod) {
 		case MOD_MK23:	// zucc
+			sweapon = "MOD_MK23";
 			switch (loc) {
 			case LOC_HDAM:
 				if (self->client->pers.gender == GENDER_MALE)
@@ -853,6 +860,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			}
 			break;
 		case MOD_MP5:
+			sweapon = "MOD_MP5";
 			switch (loc) {
 			case LOC_HDAM:
 				message = "'s brains are on the wall thanks to";
@@ -881,6 +889,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			}
 			break;
 		case MOD_M4:
+			sweapon = "MOD_M4";
 			switch (loc) {
 			case LOC_HDAM:
 				message = " had a makeover by";
@@ -904,6 +913,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			}
 			break;
 		case MOD_M3:
+			sweapon = "MOD_M3";
 			n = rand() % 2 + 1;
 			if (n == 1) {
 				message = " accepts";
@@ -914,6 +924,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			}
 			break;
 		case MOD_HC:
+			sweapon = "MOD_HC";
 			n = rand() % 2 + 1;
 			if (n == 1) {
 				if (attacker->client->pers.hc_mode)	// AQ2:TNG Deathwatch - Single Barreled HC Death Messages
@@ -936,6 +947,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			}
 			break;
 		case MOD_SNIPER:
+			sweapon = "MOD_SNIPER";
 			switch (loc) {
 			case LOC_HDAM:
 				if (self->client->ps.fov < 90) {
@@ -963,6 +975,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			}
 			break;
 		case MOD_DUAL:
+			sweapon = "MOD_DUAL";
 			switch (loc) {
 			case LOC_HDAM:
 				message = " was trepanned by";
@@ -986,6 +999,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			}
 			break;
 		case MOD_KNIFE:
+			sweapon = "MOD_KNIFE";
 			switch (loc) {
 			case LOC_HDAM:
 				if (self->client->pers.gender == GENDER_MALE)
@@ -1010,6 +1024,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			}
 			break;
 		case MOD_KNIFE_THROWN:
+			sweapon = "MOD_KNIFE_TROWN";
 			switch (loc) {
 				case LOC_HDAM:
 				message = " caught";
@@ -1048,6 +1063,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			}
 			break;
 		case MOD_KICK:
+			sweapon = "MOD_KICK";
 			n = rand() % 3 + 1;
 			if (n == 1) {
 				if (self->client->pers.gender == GENDER_MALE)
@@ -1081,6 +1097,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			}
 			break;
 		case MOD_PUNCH:
+			sweapon = "MOD_PUNCH";
 			n = rand() % 3 + 1;
 			if (n == 1) {
 				message = " got a free facelift by";
@@ -1135,6 +1152,8 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			PrintDeathMessage(death_msg, self);
 			IRC_printf(IRC_T_KILL, death_msg);
 			AddKilledPlayer(attacker, self);
+			
+			gi.dprintf( "[075STATS]-%s-%s-%s-%s-%s-%s-%i-\n",attacker_id , attacker->client->pers.netname, attacker->client->pers.ip, victem_id, self->client->pers.netname, sweapon, loc );
 
 			if (friendlyFire) {
 				if (!teamplay->value || team_round_going || !ff_afterround->value)
@@ -1149,11 +1168,13 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 					Add_Frag(attacker, mod);
 					attacker->client->radio_num_kills++;
 					Add_Death( self, true );
+					
 				}
 			}
 
 			return;
 		}	// if(message)
+		
 	}
 
 	sprintf(death_msg, "%s died\n", self->client->pers.netname);
