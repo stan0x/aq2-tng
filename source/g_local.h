@@ -1000,7 +1000,9 @@ extern cvar_t *matchmode;
 extern cvar_t *darkmatch;
 extern cvar_t *day_cycle;	// If darkmatch is on, this value is the nr of seconds between each interval (day, dusk, night, dawn)
 extern cvar_t *use_flashlight;  // Allow flashlight when not darkmatch?
-
+//stan0x
+extern cvar_t *sv_stats;
+//stan0x
 extern cvar_t *hearall;		// used in match mode
 extern cvar_t *deadtalk;
 extern cvar_t *force_skin;

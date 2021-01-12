@@ -1152,9 +1152,13 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			PrintDeathMessage(death_msg, self);
 			IRC_printf(IRC_T_KILL, death_msg);
 			AddKilledPlayer(attacker, self);
-
-			gi.dprintf( "[075STATS]-%s-%s-%s-%s-%s-%s-%i-\n",attacker_id , attacker->client->pers.netname, attacker->client->pers.ip, victem_id, self->client->pers.netname, sweapon, loc );
-
+			
+			//send player stats to console if setu discord_id "" is set.
+			if( sv_stats->value )
+			{
+				gi.dprintf( "[075STATS]-%s-%s-%s-%s-%s-%s-%i-\n",attacker_id , attacker->client->pers.netname, attacker->client->pers.ip, victem_id, self->client->pers.netname, sweapon, loc );
+			}
+			return;
 			if (friendlyFire) {
 				if (!teamplay->value || team_round_going || !ff_afterround->value)
 				{

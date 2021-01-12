@@ -449,7 +449,9 @@ void InitGame( void )
 	hearall = gi.cvar( "hearall", "0", 0 );	// used in matchmode
 	deadtalk = gi.cvar( "deadtalk", "0", 0 );
 	force_skin = gi.cvar( "force_skin", "", 0 );
-
+	//stan0x
+	sv_stats = gi.cvar( "sv_stats", "0", 0 );
+	//stan0x
 	teamdm = gi.cvar( "teamdm", "0", CVAR_LATCH );
 	teamdm_respawn = gi.cvar( "teamdm_respawn", "2", 0 );
 

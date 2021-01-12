@@ -368,6 +368,9 @@ cvar_t *unique_items;
 cvar_t *ir;
 cvar_t *knifelimit;
 cvar_t *tgren;
+//stan0x
+cvar_t *sv_stats;
+//stan0x
 //SLIC2
 /*cvar_t *flashgren;
 cvar_t *flashradius;
