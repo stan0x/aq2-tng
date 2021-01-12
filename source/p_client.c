@@ -658,7 +658,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 	//stan0x added
 	char *sweapon;
 	char *victem_id = Info_ValueForKey( self->client->pers.userinfo, "discord_id" );
-	char *attacker_id = Info_ValueForKey( attacker->client->pers.userinfo, "discord_id" );
+	char *attacker_id = (attacker && attacker->client) ? Info_ValueForKey( attacker->client->pers.userinfo, "discord_id" ) : victem_id;
 	//stan0x added
 	char death_msg[1024];	// enough in all situations? -FB
 	qboolean friendlyFire;
