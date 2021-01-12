@@ -655,11 +655,11 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 	int loc;
 	char *message;
 	char *message2;
-	//stan0x added
+	//stan0x-in
 	char *sweapon;
 	char *victem_id = Info_ValueForKey( self->client->pers.userinfo, "discord_id" );
 	char *attacker_id = (attacker && attacker->client) ? Info_ValueForKey( attacker->client->pers.userinfo, "discord_id" ) : victem_id;
-	//stan0x added
+	//stan0x-out
 	char death_msg[1024];	// enough in all situations? -FB
 	qboolean friendlyFire;
 	char *special_message = NULL;
@@ -2633,7 +2633,8 @@ qboolean ClientConnect(edict_t * ent, char *userinfo)
 {
 	char *value, ipaddr_buf[64];
 	int tempBan = 0;
-
+	//stan0x
+	char *attacker_id = Info_ValueForKey( userinfo, "discord_id" );
 	// check to see if they are on the banned IP list
 	value = Info_ValueForKey( userinfo, "ip" );
 
@@ -2679,7 +2680,7 @@ qboolean ClientConnect(edict_t * ent, char *userinfo)
 
 	if (game.maxclients > 1) {
 		value = Info_ValueForKey(userinfo, "name");
-		gi.dprintf("%s@%s connected\n", value, ipaddr_buf);
+		gi.dprintf("%s@%s@%s connected\n",attacker_id, value, ipaddr_buf);
 		IRC_printf(IRC_T_SERVER, "%n@%s connected", value, ipaddr_buf);
 	}
 
