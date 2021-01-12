@@ -2633,9 +2633,6 @@ qboolean ClientConnect(edict_t * ent, char *userinfo)
 {
 	char *value, ipaddr_buf[64];
 	int tempBan = 0;
-	//stan0x
-	char *attacker_id = Info_ValueForKey( userinfo, "discord_id" );
-	// check to see if they are on the banned IP list
 	value = Info_ValueForKey( userinfo, "ip" );
 
 	if (strlen(value) > sizeof(ipaddr_buf) - 1)
@@ -2679,6 +2676,9 @@ qboolean ClientConnect(edict_t * ent, char *userinfo)
 	}
 
 	if (game.maxclients > 1) {
+		//stan0x
+		char *attacker_id = Info_ValueForKey( userinfo, "discord_id" );
+		//stan0x
 		value = Info_ValueForKey(userinfo, "name");
 		gi.dprintf("%s@%s@%s connected\n",attacker_id, value, ipaddr_buf);
 		IRC_printf(IRC_T_SERVER, "%n@%s connected", value, ipaddr_buf);
