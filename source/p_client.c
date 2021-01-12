@@ -717,7 +717,6 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			message = "is done with the world";
 			break;
 		case MOD_FALLING:
-			sweapon = "MOD_FALLING";
 			if( self->client->push_timeout )
 				special_message = "was taught how to fly by";
 			//message = "hit the ground hard, real hard";
@@ -1128,6 +1127,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			message2 = "'s handgrenade";
 			break;
 		case MOD_HG_SPLASH:
+			sweapon = "MOD_HG_SPLASH";
 			message = " didn't see";
 			message2 = "'s handgrenade";
 			break;
@@ -1152,7 +1152,7 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			PrintDeathMessage(death_msg, self);
 			IRC_printf(IRC_T_KILL, death_msg);
 			AddKilledPlayer(attacker, self);
-			
+
 			gi.dprintf( "[075STATS]-%s-%s-%s-%s-%s-%s-%i-\n",attacker_id , attacker->client->pers.netname, attacker->client->pers.ip, victem_id, self->client->pers.netname, sweapon, loc );
 
 			if (friendlyFire) {
