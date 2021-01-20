@@ -1158,7 +1158,6 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 			{
 				gi.dprintf( "[075STATS]-%s-%s-%s-%s-%s-%s-%i-\n",attacker_id , attacker->client->pers.netname, attacker->client->pers.ip, victem_id, self->client->pers.netname, sweapon, loc );
 			}
-			return;
 			if (friendlyFire) {
 				if (!teamplay->value || team_round_going || !ff_afterround->value)
 				{
