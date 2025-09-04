@@ -521,7 +521,7 @@ VideoCheckClient
 */
 void VideoCheckClient(edict_t *ent)
 {
-	if (!ent->client->resp.vidref)
+	if (!ent->client->resp.vidref[0])
 		return;
 
 	if (video_check_lockpvs->value) {

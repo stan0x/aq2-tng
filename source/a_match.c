@@ -364,7 +364,11 @@ void Cmd_Teamskin_f(edict_t * ent)
 
 	Q_strncpyz(team->skin, newskin, sizeof(team->skin));
 
-	Com_sprintf(team->skin_index, sizeof(team->skin_index), "../players/%s_i", team->skin );
+	{
+		char temp_skin[sizeof(team->skin)];
+		Q_strncpyz(temp_skin, team->skin, sizeof(temp_skin));
+		Com_sprintf(team->skin_index, sizeof(team->skin_index), "../players/%s_i", temp_skin);
+	}
 	level.pic_teamskin[teamNum] = gi.imageindex(team->skin_index);
 	for (i = 0, e = &g_edicts[1]; i < game.maxclients; i++, e++) { //lets update players skin
 		if (!e->inuse || !e->client)

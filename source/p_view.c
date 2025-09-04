@@ -1372,7 +1372,7 @@ void ClientEndServerFrame (edict_t * ent)
 		if (video_check->value || video_check_lockpvs->value
 			|| video_check_glclear->value || darkmatch->value)
 		{
-			if (ent->client->resp.vidref && Q_stricmp(ent->client->resp.vidref, "soft"))
+			if (ent->client->resp.vidref[0] && Q_stricmp(ent->client->resp.vidref, "soft"))
 				stuffcmd (ent, "%cpsi $gl_modulate $gl_lockpvs $gl_clear $gl_dynamic $gl_driver\n");
 		}
 
@@ -1383,7 +1383,7 @@ void ClientEndServerFrame (edict_t * ent)
 		if (video_check->value || video_check_lockpvs->value
 			|| video_check_glclear->value || darkmatch->value)
 		{
-			if (ent->client->resp.vidref && Q_stricmp(ent->client->resp.vidref, "soft"))
+			if (ent->client->resp.vidref[0] && Q_stricmp(ent->client->resp.vidref, "soft"))
 				VideoCheckClient (ent);
 		}
 	}

@@ -798,7 +798,7 @@ void EndDMLevel (void)
 		// change to new map...
 		byvote = true;
 		ent->map = level.tempmap;	// TempFile added ent->map to fit 1.52 EndDMLevel() conventions
-		if (level.nextmap != NULL)
+		if (level.nextmap[0])
 			level.nextmap[0] = '\0';
 	}
 	//PG BUND - END
@@ -835,7 +835,7 @@ void EndDMLevel (void)
 	}
 	*/
 
-	if (level.nextmap != NULL && !byvote) {
+	if (level.nextmap[0] && !byvote) {
 		gi.bprintf (PRINT_HIGH, "Next map in rotation is %s.\n", level.nextmap);
 		IRC_printf (IRC_T_SERVER, "Next map in rotation is %s.", level.nextmap);
 	}
