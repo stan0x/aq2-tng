@@ -239,6 +239,22 @@ typedef struct
   int num_edicts;		// current number, <= max_edicts
 
   int max_edicts;
+
+  // Q2Admin-Python interface functions (killmsg.c)
+  int (*GetPlayerHealth)(int client_num);
+  int (*GetPlayerScore)(int client_num);
+  int (*GetPlayerTeam)(int client_num);
+  void (*GetPlayerKD)(int client_num, int *kills, int *deaths);
+  const char* (*GetPlayerWeapon)(int client_num);
+  void (*GetPlayerOrigin)(int client_num, float *x, float *y, float *z);
+  int (*IsPlayerAlive)(int client_num);
+  void (*GetPlayerStats)(int client_num, char *buf, int bufsize);
+  const char* (*GetPlayerName)(int client_num);
+  int (*GetPlayerCount)(void);
+  const char* (*GetPlayerIP)(int client_num);
+  const char* (*GetMapName)(void);
+  float (*GetPlayerAccuracy)(int client_num);
+  int (*GetPlayerHeadshots)(int client_num);
 }
 game_export_t;
 

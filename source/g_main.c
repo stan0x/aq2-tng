@@ -270,6 +270,7 @@
 
 #include <time.h>
 #include "g_local.h"
+#include "killmsg.h"
 
 game_locals_t game;
 level_locals_t level;
@@ -554,6 +555,22 @@ game_export_t *GetGameAPI (game_import_t * import)
 	globals.ServerCommand = ServerCommand;
 
 	globals.edict_size = sizeof (edict_t);
+
+	// Q2Admin-Python interface functions
+	globals.GetPlayerHealth = Q2A_GetPlayerHealth;
+	globals.GetPlayerScore = Q2A_GetPlayerScore;
+	globals.GetPlayerTeam = Q2A_GetPlayerTeam;
+	globals.GetPlayerKD = Q2A_GetPlayerKD;
+	globals.GetPlayerWeapon = Q2A_GetPlayerWeapon;
+	globals.GetPlayerOrigin = Q2A_GetPlayerOrigin;
+	globals.IsPlayerAlive = Q2A_IsPlayerAlive;
+	globals.GetPlayerStats = Q2A_GetPlayerStats;
+	globals.GetPlayerName = Q2A_GetPlayerName;
+	globals.GetPlayerCount = Q2A_GetPlayerCount;
+	globals.GetPlayerIP = Q2A_GetPlayerIP;
+	globals.GetMapName = Q2A_GetMapName;
+	globals.GetPlayerAccuracy = Q2A_GetPlayerAccuracy;
+	globals.GetPlayerHeadshots = Q2A_GetPlayerHeadshots;
 
 	return &globals;
 }
