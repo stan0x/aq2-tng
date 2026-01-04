@@ -221,3 +221,27 @@ int Q2A_GetPlayerHeadshots(int client_num)
 	
 	return ent->client->resp.hitsLocations[LOC_HDAM];
 }
+
+//
+// Get player's total shots fired
+//
+int Q2A_GetPlayerShotsFired(int client_num)
+{
+	edict_t *ent = GetClientEdict(client_num);
+	if (!ent)
+		return 0;
+	
+	return ent->client->resp.shotsTotal;
+}
+
+//
+// Get player's total hits
+//
+int Q2A_GetPlayerHits(int client_num)
+{
+	edict_t *ent = GetClientEdict(client_num);
+	if (!ent)
+		return 0;
+	
+	return ent->client->resp.hitsTotal;
+}

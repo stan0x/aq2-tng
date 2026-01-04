@@ -571,6 +571,8 @@ game_export_t *GetGameAPI (game_import_t * import)
 	globals.GetMapName = Q2A_GetMapName;
 	globals.GetPlayerAccuracy = Q2A_GetPlayerAccuracy;
 	globals.GetPlayerHeadshots = Q2A_GetPlayerHeadshots;
+	globals.GetPlayerShotsFired = Q2A_GetPlayerShotsFired;
+	globals.GetPlayerHits = Q2A_GetPlayerHits;
 
 	return &globals;
 }

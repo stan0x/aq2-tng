@@ -255,6 +255,8 @@ typedef struct
   const char* (*GetMapName)(void);
   float (*GetPlayerAccuracy)(int client_num);
   int (*GetPlayerHeadshots)(int client_num);
+  int (*GetPlayerShotsFired)(int client_num);
+  int (*GetPlayerHits)(int client_num);
 }
 game_export_t;
 

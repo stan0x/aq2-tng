@@ -51,4 +51,10 @@ float Q2A_GetPlayerAccuracy(int client_num);
 // Get player's headshot count
 int Q2A_GetPlayerHeadshots(int client_num);
 
+// Get player's total shots fired
+int Q2A_GetPlayerShotsFired(int client_num);
+
+// Get player's total hits
+int Q2A_GetPlayerHits(int client_num);
+
 #endif // KILLMSG_H
