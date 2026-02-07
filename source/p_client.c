@@ -351,6 +351,7 @@ void Add_Frag(edict_t * ent, int mod)
 		return;
 
 	ent->client->resp.kills++;
+	ent->client->resp.round_kills++;
 	if (mod > 0 && mod < MAX_GUNSTAT) {
 		ent->client->resp.gunstats[mod].kills++;
 	}

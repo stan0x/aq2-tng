@@ -389,6 +389,7 @@ void InitGame( void )
 	skipmotd = gi.cvar( "skipmotd", "0", 0 );
 	roundtimelimit = gi.cvar( "roundtimelimit", "0", CVAR_SERVERINFO );
 	fastround = gi.cvar( "fastround", "0", 0 );
+	use_mvp = gi.cvar( "use_mvp", "1", 0 );
 	maxteamkills = gi.cvar( "maxteamkills", "0", 0 );
 	twbanrounds = gi.cvar( "twbanrounds", "2", 0 );
 	tkbanrounds = gi.cvar( "tkbanrounds", "2", 0 );

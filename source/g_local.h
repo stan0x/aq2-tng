@@ -959,6 +959,7 @@ extern cvar_t *motd_time;
 extern cvar_t *actionmaps;
 extern cvar_t *roundtimelimit;
 extern cvar_t *fastround;
+extern cvar_t *use_mvp;
 extern cvar_t *maxteamkills;
 extern cvar_t *tkbanrounds;
 extern cvar_t *twbanrounds;
@@ -1513,6 +1514,8 @@ typedef struct
   int deaths;			// deaths
 
   int damage_dealt;		// keep track of damage dealt by player to other players
+  int round_damage;		// damage dealt this round (for MVP)
+  int round_kills;		// kills this round (for MVP)
 
   int team;			// team the player is on
   int subteam;

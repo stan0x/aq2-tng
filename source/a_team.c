@@ -1650,8 +1650,60 @@ void RunWarmup ()
 	}
 }
 
+// ResetRoundStats: Reset per-round stats for all players
+static void ResetRoundStats(void)
+{
+	int i;
+	edict_t *ent;
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		ent = &g_edicts[1 + i];
+		if (!ent->inuse)
+			continue;
+		ent->client->resp.round_damage = 0;
+		ent->client->resp.round_kills = 0;
+	}
+}
+
+// AnnounceRoundMVP: Find and announce the MVP of the round
+static void AnnounceRoundMVP(void)
+{
+	int i;
+	edict_t *ent, *mvp = NULL;
+	int best_damage = 0;
+	int best_kills = 0;
+
+	if (!use_mvp->value)
+		return;
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		ent = &g_edicts[1 + i];
+		if (!ent->inuse || ent->client->resp.team == NOTEAM)
+			continue;
+
+		// MVP is player with most damage, kills as tiebreaker
+		if (ent->client->resp.round_damage > best_damage ||
+		    (ent->client->resp.round_damage == best_damage &&
+		     ent->client->resp.round_kills > best_kills))
+		{
+			best_damage = ent->client->resp.round_damage;
+			best_kills = ent->client->resp.round_kills;
+			mvp = ent;
+		}
+	}
+
+	if (mvp && best_damage > 0)
+	{
+		gi.bprintf(PRINT_HIGH, "Round MVP: %s (%d damage, %d kills)\n",
+			mvp->client->pers.netname, best_damage, best_kills);
+	}
+}
+
 void StartRound ()
 {
+	ResetRoundStats();
 	team_round_going = 1;
 	current_round_length = 0;
 }
@@ -1918,6 +1970,8 @@ int WonGame (int winner)
 	edict_t *player, *cl_ent; // was: edict_t *player;
 	int i;
 	char arg[64];
+
+	AnnounceRoundMVP();
 
 	gi.bprintf (PRINT_HIGH, "The round is over:\n");
 	IRC_printf (IRC_T_GAME, "The round is over:");
