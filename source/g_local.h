@@ -958,6 +958,7 @@ extern cvar_t *radiolog;
 extern cvar_t *motd_time;
 extern cvar_t *actionmaps;
 extern cvar_t *roundtimelimit;
+extern cvar_t *fastround;
 extern cvar_t *maxteamkills;
 extern cvar_t *tkbanrounds;
 extern cvar_t *twbanrounds;

@@ -291,6 +291,7 @@ cvar_t *radiolog;
 cvar_t *motd_time;
 cvar_t *actionmaps;
 cvar_t *roundtimelimit;
+cvar_t *fastround;
 cvar_t *maxteamkills;
 cvar_t *twbanrounds;
 cvar_t *tkbanrounds;

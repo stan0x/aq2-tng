@@ -388,6 +388,7 @@ void InitGame( void )
 	limchasecam = gi.cvar( "limchasecam", "0", CVAR_LATCH );
 	skipmotd = gi.cvar( "skipmotd", "0", 0 );
 	roundtimelimit = gi.cvar( "roundtimelimit", "0", CVAR_SERVERINFO );
+	fastround = gi.cvar( "fastround", "0", 0 );
 	maxteamkills = gi.cvar( "maxteamkills", "0", 0 );
 	twbanrounds = gi.cvar( "twbanrounds", "2", 0 );
 	tkbanrounds = gi.cvar( "tkbanrounds", "2", 0 );

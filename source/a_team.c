@@ -2187,7 +2187,7 @@ int CheckTeamRules (void)
 		winner = CheckForWinner();
 		if (winner != WINNER_NONE)
 		{
-			if (!checked_tie)
+			if (!checked_tie && !fastround->value)
 			{
 				holding_on_tie_check = 50;
 				return 0;
@@ -2200,7 +2200,9 @@ int CheckTeamRules (void)
 			holding_on_tie_check = 0;
 			timewarning = fragwarning = 0;
 
-			if (use_tourney->value)
+			if (fastround->value)
+				team_round_countdown = 20;
+			else if (use_tourney->value)
 				round_delay_time = TourneySetTime (T_END);
 			else
 				team_round_countdown = 71;
